@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Multicore Render Lab · PSP DAM2</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <main class="shell">
+    <section class="panel header">
+      <div>
+        <h1>Multicore Render Lab</h1>
+        <p>Proyecto final multinúcleo basado en el ejemplo Monte Carlo de clase, ampliado con cola de trabajos, benchmark y persistencia SQLite.</p>
+      </div>
+      <div class="badge">Cores detectados: <strong id="coreCount">{{ cores }}</strong></div>
+    </section>
+
+    <section class="panel controls">
+      <div class="grid grid-6">
+        <label>Ancho
+          <input id="width" type="number" min="160" max="1600" value="900" />
+        </label>
+        <label>Alto
+          <input id="height" type="number" min="100" max="1000" value="540" />
+        </label>
+        <label>Iteraciones máx
+          <input id="maxIter" type="number" min="50" max="2000" value="700" />
+        </label>
+        <label>Samples/pixel
+          <input id="samples" type="number" min="1" max="12" value="3" />
+        </label>
+        <label>Tamaño de chunk
+          <input id="chunkSize" type="number" min="4" max="128" value="16" />
+        </label>
+        <label>Modo
+          <select id="mode">
+            <option value="multicore">Multicore</option>
+            <option value="single">Single core</option>
+          </select>
+        </label>
+      </div>
+      <div class="actions">
+        <button id="runBtn">Renderizar</button>
+        <button id="benchBtn" class="secondary">Benchmark single vs multicore</button>
+        <span id="status" class="status">Esperando ejecución…</span>
+      </div>
+      <div class="progress-wrap">
+        <div id="progressBar" class="progress"></div>
+      </div>
+      <div class="stats" id="stats"></div>
+    </section>
+
+    <section class="panel viewer">
+      <h2>Render fractal Monte Carlo</h2>
+      <canvas id="canvas" width="900" height="540"></canvas>
+    </section>
+
+    <section class="panel">
+      <h2>Histórico de trabajos (SQLite)</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th><th>Fecha</th><th>Modo</th><th>Resolución</th><th>Iter</th><th>Samples</th><th>Workers</th><th>Duración</th><th>Pix/s</th><th>Estado</th>
+            </tr>
+          </thead>
+          <tbody id="historyBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+  <script src="/static/app.js"></script>
+</body>
+</html>
