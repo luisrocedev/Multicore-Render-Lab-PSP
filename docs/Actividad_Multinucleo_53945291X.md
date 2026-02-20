@@ -35,21 +35,21 @@ La elección de Python se justifica por su módulo `concurrent.futures`, que ofr
 - La carga computacional es **variable** (los píxeles del borde del conjunto requieren más iteraciones).
 - El muestreo Monte Carlo multiplica la carga, haciendo evidente el beneficio del paralelismo.
 
-| Concepto PSP              | Implementación                                            |
-|---------------------------|-----------------------------------------------------------|
-| Programación multiproceso | `ProcessPoolExecutor` con N workers                       |
-| División de trabajo       | Chunking por franjas horizontales de la imagen            |
+| Concepto PSP              | Implementación                                              |
+| ------------------------- | ----------------------------------------------------------- |
+| Programación multiproceso | `ProcessPoolExecutor` con N workers                         |
+| División de trabajo       | Chunking por franjas horizontales de la imagen              |
 | Sincronización            | `as_completed()` + `futures` para recolección de resultados |
-| Comunicación IPC          | Serialización pickle automática entre procesos            |
-| Persistencia              | SQLite con tabla `render_jobs`                            |
+| Comunicación IPC          | Serialización pickle automática entre procesos              |
+| Persistencia              | SQLite con tabla `render_jobs`                              |
 
 ### 1.4 Tecnologías utilizadas
 
 | Capa      | Stack                                                           |
-|-----------|-----------------------------------------------------------------|
+| --------- | --------------------------------------------------------------- |
 | Backend   | Python 3.12 · Flask 3.x · SQLite 3                              |
-| Paralelo  | `concurrent.futures.ProcessPoolExecutor`                         |
-| Algoritmo | Mandelbrot escape-time + jittered Monte Carlo sampling           |
+| Paralelo  | `concurrent.futures.ProcessPoolExecutor`                        |
+| Algoritmo | Mandelbrot escape-time + jittered Monte Carlo sampling          |
 | Frontend  | HTML5 · CSS3 (custom properties, dark mode) · JavaScript ES2022 |
 | Canvas    | Canvas API 2D · `ImageData` + `putImageData`                    |
 
@@ -200,22 +200,22 @@ def run_render_job(job_id):
 
 **Aspectos clave de la paralelización:**
 
-| Aspecto               | Implementación                                                   |
-|------------------------|------------------------------------------------------------------|
-| Tipo de pool           | `ProcessPoolExecutor` (procesos reales, no hilos)                |
-| Workers                | `os.cpu_count()` en modo multicore, 1 en modo single            |
-| División de trabajo    | Franjas horizontales de `chunk_size` filas                       |
-| Recolección            | `as_completed()` para progreso no-bloqueante                     |
-| Serialización          | Pickle automático (parámetros → worker → resultado)              |
-| Protección de estado   | `threading.Lock` para acceso concurrente al dict `jobs`          |
-| Hilo de ejecución      | `threading.Thread(daemon=True)` para no bloquear Flask           |
+| Aspecto              | Implementación                                          |
+| -------------------- | ------------------------------------------------------- |
+| Tipo de pool         | `ProcessPoolExecutor` (procesos reales, no hilos)       |
+| Workers              | `os.cpu_count()` en modo multicore, 1 en modo single    |
+| División de trabajo  | Franjas horizontales de `chunk_size` filas              |
+| Recolección          | `as_completed()` para progreso no-bloqueante            |
+| Serialización        | Pickle automático (parámetros → worker → resultado)     |
+| Protección de estado | `threading.Lock` para acceso concurrente al dict `jobs` |
+| Hilo de ejecución    | `threading.Thread(daemon=True)` para no bloquear Flask  |
 
 ### 2.5 API REST (Flask)
 
 El backend expone 5 endpoints:
 
-| Endpoint                          | Método | Descripción                                        |
-|-----------------------------------|--------|----------------------------------------------------|
+| Endpoint                          | Método | Descripción                                         |
+| --------------------------------- | ------ | --------------------------------------------------- |
 | `/api/jobs`                       | POST   | Crear trabajo con parámetros validados              |
 | `/api/jobs/<id>`                  | GET    | Estado, progreso y métricas de un trabajo           |
 | `/api/jobs/<id>?include_result=1` | GET    | Igual + array completo de píxeles renderizados      |
@@ -246,49 +246,49 @@ El flujo completo de un render job es:
 
 El frontend se organiza en **2 pestañas**:
 
-| Pestaña        | Contenido                                                          |
-|----------------|--------------------------------------------------------------------|
-| **Renderizar** | Formulario de parámetros, botones, progreso, KPIs, stats y canvas  |
+| Pestaña        | Contenido                                                           |
+| -------------- | ------------------------------------------------------------------- |
+| **Renderizar** | Formulario de parámetros, botones, progreso, KPIs, stats y canvas   |
 | **Historial**  | Búsqueda en vivo, tabla histórica con badges, export/import/limpiar |
 
 **6 KPIs globales** (consultados vía `/api/stats`):
 
-| KPI              | Color   | Descripción                              |
-|------------------|---------|------------------------------------------|
-| Total trabajos   | Violeta | Número total de render jobs              |
-| Completados      | Verde   | Jobs con estado `done`                   |
-| Fallidos         | Rojo    | Jobs con estado `failed`                 |
-| Media duración   | Ámbar   | Promedio de `duration_ms`                |
-| Media px/s       | Cyan    | Promedio de `pixels_per_second`          |
-| Total píxeles    | Azul    | Suma de píxeles renderizados             |
+| KPI            | Color   | Descripción                     |
+| -------------- | ------- | ------------------------------- |
+| Total trabajos | Violeta | Número total de render jobs     |
+| Completados    | Verde   | Jobs con estado `done`          |
+| Fallidos       | Rojo    | Jobs con estado `failed`        |
+| Media duración | Ámbar   | Promedio de `duration_ms`       |
+| Media px/s     | Cyan    | Promedio de `pixels_per_second` |
+| Total píxeles  | Azul    | Suma de píxeles renderizados    |
 
 **4 stats inline** (por render):
 
-| Stat      | Descripción                  |
-|-----------|------------------------------|
-| Modo      | multicore / single           |
-| Workers   | Número de procesos usados    |
-| Duración  | Tiempo real en ms            |
-| Px/s      | Velocidad de renderizado     |
+| Stat     | Descripción               |
+| -------- | ------------------------- |
+| Modo     | multicore / single        |
+| Workers  | Número de procesos usados |
+| Duración | Tiempo real en ms         |
+| Px/s     | Velocidad de renderizado  |
 
 **14 mejoras v2:**
 
-| #  | Mejora                 | Implementación                                     |
-|----|------------------------|----------------------------------------------------|
-| 1  | Dark mode              | Toggle + `data-theme` + `localStorage`             |
-| 2  | Pestañas               | `data-tab` con toggle de clases                    |
-| 3  | Toasts                 | 4 tonos con animación slideUp + fadeOut             |
-| 4  | Confirm overlay        | Promise-based con `backdrop-filter: blur(4px)`     |
-| 5  | 6 KPIs semánticos      | Bordes laterales coloreados + fetch `/api/stats`   |
-| 6  | Status dot             | Heartbeat cada 5s con clase `online`/`offline`     |
-| 7  | Badges modo/estado     | Pills coloreadas multicore/single + done/failed    |
-| 8  | Export JSON            | Blob + `URL.createObjectURL` + descarga automática |
-| 9  | Import JSON            | FileReader + confirm + carga en tabla              |
-| 10 | Búsqueda en vivo       | `Array.filter` sobre caché de historial            |
-| 11 | Limpiar historial      | nousConfirm + reset de caché local                 |
-| 12 | Responsive             | 3 breakpoints: 1100px (tablet), 700px (móvil)     |
-| 13 | Empty states           | Mensajes centrados cuando las tablas están vacías  |
-| 14 | Auto-refresh           | `setInterval(loadAll, 8000)`                       |
+| #   | Mejora             | Implementación                                     |
+| --- | ------------------ | -------------------------------------------------- |
+| 1   | Dark mode          | Toggle + `data-theme` + `localStorage`             |
+| 2   | Pestañas           | `data-tab` con toggle de clases                    |
+| 3   | Toasts             | 4 tonos con animación slideUp + fadeOut            |
+| 4   | Confirm overlay    | Promise-based con `backdrop-filter: blur(4px)`     |
+| 5   | 6 KPIs semánticos  | Bordes laterales coloreados + fetch `/api/stats`   |
+| 6   | Status dot         | Heartbeat cada 5s con clase `online`/`offline`     |
+| 7   | Badges modo/estado | Pills coloreadas multicore/single + done/failed    |
+| 8   | Export JSON        | Blob + `URL.createObjectURL` + descarga automática |
+| 9   | Import JSON        | FileReader + confirm + carga en tabla              |
+| 10  | Búsqueda en vivo   | `Array.filter` sobre caché de historial            |
+| 11  | Limpiar historial  | nousConfirm + reset de caché local                 |
+| 12  | Responsive         | 3 breakpoints: 1100px (tablet), 700px (móvil)      |
+| 13  | Empty states       | Mensajes centrados cuando las tablas están vacías  |
+| 14  | Auto-refresh       | `setInterval(loadAll, 8000)`                       |
 
 ### 2.8 Paleta de color fractal
 
@@ -296,7 +296,7 @@ La conversión de iteraciones de escape a color RGB se realiza mediante una pale
 
 ```javascript
 function palette(iter, maxIter) {
-  if (iter >= maxIter) return [0, 0, 0];   // Interior → negro
+  if (iter >= maxIter) return [0, 0, 0]; // Interior → negro
   const t = iter / maxIter;
   const r = Math.floor(9 * (1 - t) * t * t * t * 255);
   const g = Math.floor(15 * (1 - t) * (1 - t) * t * t * 255);
@@ -411,14 +411,14 @@ Cada fila muestra **badges semánticos**: violeta para multicore, ámbar para si
 
 ### 3.3 Parámetros y su impacto
 
-| Parámetro    | Rango       | Impacto en rendimiento                                |
-|--------------|-------------|-------------------------------------------------------|
-| `width`      | 160–1600    | Lineal: duplicar ancho ≈ duplicar tiempo              |
-| `height`     | 100–1000    | Lineal: duplicar alto ≈ duplicar tiempo               |
-| `max_iter`   | 50–2000     | Afecta solo a píxeles del borde (carga variable)      |
-| `samples`    | 1–12        | Lineal: cada sample multiplica el cálculo por píxel   |
-| `chunk_size` | 4–128       | Menor = más chunks = mejor balance, pero más overhead |
-| `mode`       | multi/single| Speedup proporcional al número de cores               |
+| Parámetro    | Rango        | Impacto en rendimiento                                |
+| ------------ | ------------ | ----------------------------------------------------- |
+| `width`      | 160–1600     | Lineal: duplicar ancho ≈ duplicar tiempo              |
+| `height`     | 100–1000     | Lineal: duplicar alto ≈ duplicar tiempo               |
+| `max_iter`   | 50–2000      | Afecta solo a píxeles del borde (carga variable)      |
+| `samples`    | 1–12         | Lineal: cada sample multiplica el cálculo por píxel   |
+| `chunk_size` | 4–128        | Menor = más chunks = mejor balance, pero más overhead |
+| `mode`       | multi/single | Speedup proporcional al número de cores               |
 
 La carga total en operaciones es aproximadamente:
 
@@ -465,15 +465,15 @@ El proyecto **Multicore Render Lab** cumple integralmente con los requisitos de 
 
 ### 4.2 Competencias demostradas
 
-| Competencia               | Evidencia                                                    |
-|---------------------------|--------------------------------------------------------------|
-| Programación multiproceso | `ProcessPoolExecutor` con N workers en procesos reales       |
-| División de trabajo       | Chunking por franjas + ensamblado ordenado de resultados     |
-| Sincronización            | `threading.Lock` + `as_completed()` + `futures`              |
-| Comunicación IPC          | Serialización pickle automática entre procesos               |
-| Persistencia de datos     | SQLite con tabla `render_jobs`, métricas y trazabilidad      |
-| Desarrollo web full-stack | Flask REST API + SPA con JS vanilla + Canvas API             |
-| Diseño UI/UX              | Dark mode, responsive, toasts, confirm, badges, KPIs         |
+| Competencia               | Evidencia                                                |
+| ------------------------- | -------------------------------------------------------- |
+| Programación multiproceso | `ProcessPoolExecutor` con N workers en procesos reales   |
+| División de trabajo       | Chunking por franjas + ensamblado ordenado de resultados |
+| Sincronización            | `threading.Lock` + `as_completed()` + `futures`          |
+| Comunicación IPC          | Serialización pickle automática entre procesos           |
+| Persistencia de datos     | SQLite con tabla `render_jobs`, métricas y trazabilidad  |
+| Desarrollo web full-stack | Flask REST API + SPA con JS vanilla + Canvas API         |
+| Diseño UI/UX              | Dark mode, responsive, toasts, confirm, badges, KPIs     |
 
 ### 4.3 Ley de Amdahl
 
@@ -521,19 +521,19 @@ Este proyecto ha sido especialmente enriquecedor por la necesidad de coordinar p
 
 ## Anexo: Tabla resumen de mejoras v2
 
-| #  | Mejora                 | Archivo                 | Técnica                                |
-|----|------------------------|-------------------------|----------------------------------------|
-| 1  | Dark mode              | styles.css + app.js     | `[data-theme="dark"]` + `localStorage` |
-| 2  | Pestañas               | index.html + app.js     | `data-tab` con toggle de clases        |
-| 3  | Toasts                 | styles.css + app.js     | Animaciones CSS + DOM dinámico         |
-| 4  | Confirm overlay        | index.html + app.js     | Promise + `backdrop-filter`            |
-| 5  | 6 KPIs semánticos      | index.html + styles.css | `border-left-color` por categoría      |
-| 6  | Status dot             | styles.css + app.js     | `fetch('/api/stats')` + clase toggle   |
-| 7  | Badges modo/estado     | styles.css + app.js     | `.badge-multicore` + `.badge-done`     |
-| 8  | Export JSON            | app.js                  | `Blob` + `URL.createObjectURL`         |
-| 9  | Import JSON            | app.js                  | `FileReader` + `nousConfirm`           |
-| 10 | Búsqueda en vivo       | app.js                  | `Array.filter` sobre caché             |
-| 11 | Limpiar historial      | app.js                  | `nousConfirm` + reset caché            |
-| 12 | Responsive             | styles.css              | `@media` 1100px + 700px                |
-| 13 | Empty states           | app.js + styles.css     | `.empty-state` centrado                |
-| 14 | Auto-refresh           | app.js                  | `setInterval(loadAll, 8000)`           |
+| #   | Mejora             | Archivo                 | Técnica                                |
+| --- | ------------------ | ----------------------- | -------------------------------------- |
+| 1   | Dark mode          | styles.css + app.js     | `[data-theme="dark"]` + `localStorage` |
+| 2   | Pestañas           | index.html + app.js     | `data-tab` con toggle de clases        |
+| 3   | Toasts             | styles.css + app.js     | Animaciones CSS + DOM dinámico         |
+| 4   | Confirm overlay    | index.html + app.js     | Promise + `backdrop-filter`            |
+| 5   | 6 KPIs semánticos  | index.html + styles.css | `border-left-color` por categoría      |
+| 6   | Status dot         | styles.css + app.js     | `fetch('/api/stats')` + clase toggle   |
+| 7   | Badges modo/estado | styles.css + app.js     | `.badge-multicore` + `.badge-done`     |
+| 8   | Export JSON        | app.js                  | `Blob` + `URL.createObjectURL`         |
+| 9   | Import JSON        | app.js                  | `FileReader` + `nousConfirm`           |
+| 10  | Búsqueda en vivo   | app.js                  | `Array.filter` sobre caché             |
+| 11  | Limpiar historial  | app.js                  | `nousConfirm` + reset caché            |
+| 12  | Responsive         | styles.css              | `@media` 1100px + 700px                |
+| 13  | Empty states       | app.js + styles.css     | `.empty-state` centrado                |
+| 14  | Auto-refresh       | app.js                  | `setInterval(loadAll, 8000)`           |

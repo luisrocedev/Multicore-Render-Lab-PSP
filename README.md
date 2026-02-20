@@ -23,22 +23,22 @@
 
 ## ✨ Características
 
-| #  | Funcionalidad                        | Detalle                                           |
-|----|--------------------------------------|---------------------------------------------------|
-| 1  | Renderizado Mandelbrot Monte Carlo   | Muestreo jittered con N samples por píxel         |
-| 2  | ProcessPoolExecutor                  | Distribución de chunks en N workers               |
-| 3  | Modo benchmark                       | Single-core vs multicore con cálculo de speedup   |
-| 4  | Cola de trabajos                     | Ejecución asíncrona con polling de progreso        |
-| 5  | Persistencia SQLite                  | Histórico completo de render jobs con métricas     |
-| 6  | API REST completa                    | Crear, consultar, historial, estadísticas          |
-| 7  | Canvas HTML5                         | Visualización de fractales con paleta cromática     |
-| 8  | Dark mode                            | Toggle con persistencia en localStorage            |
-| 9  | Sistema de toasts                    | Notificaciones con 4 tonos semánticos              |
-| 10 | Exportar / Importar JSON             | Backup del historial de trabajos                   |
-| 11 | KPIs en tiempo real                  | 6 indicadores con bordes semánticos                |
-| 12 | Búsqueda en vivo                     | Filtro instantáneo sobre el historial              |
-| 13 | Badges semánticos                    | Estado (done/running/failed) + modo (multi/single) |
-| 14 | Responsive                           | 3 breakpoints: desktop, tablet, móvil              |
+| #   | Funcionalidad                      | Detalle                                            |
+| --- | ---------------------------------- | -------------------------------------------------- |
+| 1   | Renderizado Mandelbrot Monte Carlo | Muestreo jittered con N samples por píxel          |
+| 2   | ProcessPoolExecutor                | Distribución de chunks en N workers                |
+| 3   | Modo benchmark                     | Single-core vs multicore con cálculo de speedup    |
+| 4   | Cola de trabajos                   | Ejecución asíncrona con polling de progreso        |
+| 5   | Persistencia SQLite                | Histórico completo de render jobs con métricas     |
+| 6   | API REST completa                  | Crear, consultar, historial, estadísticas          |
+| 7   | Canvas HTML5                       | Visualización de fractales con paleta cromática    |
+| 8   | Dark mode                          | Toggle con persistencia en localStorage            |
+| 9   | Sistema de toasts                  | Notificaciones con 4 tonos semánticos              |
+| 10  | Exportar / Importar JSON           | Backup del historial de trabajos                   |
+| 11  | KPIs en tiempo real                | 6 indicadores con bordes semánticos                |
+| 12  | Búsqueda en vivo                   | Filtro instantáneo sobre el historial              |
+| 13  | Badges semánticos                  | Estado (done/running/failed) + modo (multi/single) |
+| 14  | Responsive                         | 3 breakpoints: desktop, tablet, móvil              |
 
 ---
 
@@ -90,13 +90,13 @@ Abrir **http://127.0.0.1:5055** en el navegador.
 
 ## 📡 API REST
 
-| Endpoint                            | Método | Descripción                              |
-|-------------------------------------|--------|------------------------------------------|
-| `/api/jobs`                         | POST   | Crear trabajo de renderizado              |
-| `/api/jobs/<id>`                    | GET    | Estado y progreso de un trabajo           |
-| `/api/jobs/<id>?include_result=1`   | GET    | Estado + datos de píxeles del resultado   |
-| `/api/history`                      | GET    | Últimos 30 trabajos desde SQLite          |
-| `/api/stats`                        | GET    | KPIs agregados (total, medias, fallos)    |
+| Endpoint                          | Método | Descripción                             |
+| --------------------------------- | ------ | --------------------------------------- |
+| `/api/jobs`                       | POST   | Crear trabajo de renderizado            |
+| `/api/jobs/<id>`                  | GET    | Estado y progreso de un trabajo         |
+| `/api/jobs/<id>?include_result=1` | GET    | Estado + datos de píxeles del resultado |
+| `/api/history`                    | GET    | Últimos 30 trabajos desde SQLite        |
+| `/api/stats`                      | GET    | KPIs agregados (total, medias, fallos)  |
 
 ### Ejemplo: crear trabajo
 
@@ -128,34 +128,34 @@ Multicore-Render-Lab/
 
 ## 🧪 Mejoras v2 (14 ítems)
 
-| #  | Mejora                 | Archivo(s)           | Técnica                               |
-|----|------------------------|----------------------|---------------------------------------|
-| 1  | Dark mode              | CSS + JS             | `[data-theme="dark"]` + localStorage  |
-| 2  | Pestañas               | HTML + JS            | `data-tab` con toggle de clases       |
-| 3  | Toasts                 | CSS + JS             | 4 tonos + slideUp + fadeOut           |
-| 4  | Confirm overlay        | HTML + JS            | Promise + backdrop-filter             |
-| 5  | 6 KPIs semánticos      | HTML + CSS           | border-left coloreados                |
-| 6  | Status dot             | CSS + JS             | Heartbeat /api/stats + pulse          |
-| 7  | Badges modo/estado     | CSS + JS             | .badge-multicore, .badge-done         |
-| 8  | Export JSON            | JS                   | Blob + URL.createObjectURL            |
-| 9  | Import JSON            | JS                   | FileReader + nousConfirm              |
-| 10 | Búsqueda en vivo       | JS                   | Array.filter sobre caché              |
-| 11 | Limpiar historial      | JS                   | nousConfirm + reset caché             |
-| 12 | Responsive             | CSS                  | @media 1100px + 700px                 |
-| 13 | Empty states           | CSS + JS             | .empty-state centrado                 |
-| 14 | Auto-refresh           | JS                   | setInterval 8s                        |
+| #   | Mejora             | Archivo(s) | Técnica                              |
+| --- | ------------------ | ---------- | ------------------------------------ |
+| 1   | Dark mode          | CSS + JS   | `[data-theme="dark"]` + localStorage |
+| 2   | Pestañas           | HTML + JS  | `data-tab` con toggle de clases      |
+| 3   | Toasts             | CSS + JS   | 4 tonos + slideUp + fadeOut          |
+| 4   | Confirm overlay    | HTML + JS  | Promise + backdrop-filter            |
+| 5   | 6 KPIs semánticos  | HTML + CSS | border-left coloreados               |
+| 6   | Status dot         | CSS + JS   | Heartbeat /api/stats + pulse         |
+| 7   | Badges modo/estado | CSS + JS   | .badge-multicore, .badge-done        |
+| 8   | Export JSON        | JS         | Blob + URL.createObjectURL           |
+| 9   | Import JSON        | JS         | FileReader + nousConfirm             |
+| 10  | Búsqueda en vivo   | JS         | Array.filter sobre caché             |
+| 11  | Limpiar historial  | JS         | nousConfirm + reset caché            |
+| 12  | Responsive         | CSS        | @media 1100px + 700px                |
+| 13  | Empty states       | CSS + JS   | .empty-state centrado                |
+| 14  | Auto-refresh       | JS         | setInterval 8s                       |
 
 ---
 
 ## 🛠 Stack tecnológico
 
-| Capa     | Tecnología                                                |
-|----------|-----------------------------------------------------------|
-| Backend  | Python 3.12 · Flask 3.x                                   |
-| Paralelo | `concurrent.futures.ProcessPoolExecutor`                   |
-| BD       | SQLite 3 (tabla `render_jobs`)                             |
-| Frontend | HTML5 · CSS3 (custom properties) · JavaScript ES2022      |
-| Canvas   | Canvas API 2D con `putImageData`                           |
+| Capa     | Tecnología                                           |
+| -------- | ---------------------------------------------------- |
+| Backend  | Python 3.12 · Flask 3.x                              |
+| Paralelo | `concurrent.futures.ProcessPoolExecutor`             |
+| BD       | SQLite 3 (tabla `render_jobs`)                       |
+| Frontend | HTML5 · CSS3 (custom properties) · JavaScript ES2022 |
+| Canvas   | Canvas API 2D con `putImageData`                     |
 
 ---
 
