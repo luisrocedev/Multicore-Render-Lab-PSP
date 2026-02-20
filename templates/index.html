@@ -1,75 +1,132 @@
 <!doctype html>
-<html lang="es">
+<html lang="es" data-theme="light">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Multicore Render Lab · PSP DAM2</title>
-  <link rel="stylesheet" href="/static/styles.css" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Multicore Render Lab</title>
+  <link rel="stylesheet" href="/static/styles.css"/>
 </head>
 <body>
-  <main class="shell">
-    <section class="panel header">
-      <div>
-        <h1>Multicore Render Lab</h1>
-        <p>Proyecto final multinúcleo basado en el ejemplo Monte Carlo de clase, ampliado con cola de trabajos, benchmark y persistencia SQLite.</p>
-      </div>
-      <div class="badge">Cores detectados: <strong id="coreCount">{{ cores }}</strong></div>
-    </section>
 
-    <section class="panel controls">
-      <div class="grid grid-6">
-        <label>Ancho
-          <input id="width" type="number" min="160" max="1600" value="900" />
-        </label>
-        <label>Alto
-          <input id="height" type="number" min="100" max="1000" value="540" />
-        </label>
-        <label>Iteraciones máx
-          <input id="maxIter" type="number" min="50" max="2000" value="700" />
-        </label>
-        <label>Samples/pixel
-          <input id="samples" type="number" min="1" max="12" value="3" />
-        </label>
-        <label>Tamaño de chunk
-          <input id="chunkSize" type="number" min="4" max="128" value="16" />
-        </label>
-        <label>Modo
-          <select id="mode">
-            <option value="multicore">Multicore</option>
-            <option value="single">Single core</option>
-          </select>
-        </label>
-      </div>
-      <div class="actions">
-        <button id="runBtn">Renderizar</button>
-        <button id="benchBtn" class="secondary">Benchmark single vs multicore</button>
-        <span id="status" class="status">Esperando ejecución…</span>
-      </div>
-      <div class="progress-wrap">
-        <div id="progressBar" class="progress"></div>
-      </div>
-      <div class="stats" id="stats"></div>
-    </section>
+<!-- ───── HERO + TOOLBAR ───── -->
+<header class="hero">
+  <div class="hero-left">
+    <h1>🔥 Multicore Render Lab</h1>
+    <p class="subtitle">Renderizado Monte Carlo multinúcleo · PSP DAM2</p>
+  </div>
+  <div class="toolbar">
+    <span class="status-dot" id="statusDot" title="Estado del servidor"></span>
+    <span class="core-badge">Cores&nbsp;<strong id="coreCount">{{ cores }}</strong></span>
+    <button class="icon-btn" id="btnExport" title="Exportar historial JSON">📦</button>
+    <button class="icon-btn" id="btnImport" title="Importar historial JSON">📂</button>
+    <button class="icon-btn" id="btnDark" title="Alternar modo oscuro">🌙</button>
+    <input type="file" id="fileImport" accept=".json" hidden/>
+  </div>
+</header>
 
-    <section class="panel viewer">
-      <h2>Render fractal Monte Carlo</h2>
-      <canvas id="canvas" width="900" height="540"></canvas>
-    </section>
+<!-- ───── TABS ───── -->
+<nav class="tabs">
+  <button class="tab active" data-tab="render">🎨 Renderizar</button>
+  <button class="tab" data-tab="history">📋 Historial <span class="tab-badge" id="historyBadge">0</span></button>
+</nav>
 
-    <section class="panel">
-      <h2>Histórico de trabajos (SQLite)</h2>
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th>ID</th><th>Fecha</th><th>Modo</th><th>Resolución</th><th>Iter</th><th>Samples</th><th>Workers</th><th>Duración</th><th>Pix/s</th><th>Estado</th>
-            </tr>
-          </thead>
-          <tbody id="historyBody"></tbody>
-        </table>
-      </div>
-    </section>
-  </main>
-  <script src="/static/app.js"></script>
+<!-- ═══════ TAB: RENDERIZAR ═══════ -->
+<div class="tab-content active" id="tab-render">
+
+  <!-- KPIs globales -->
+  <section class="kpi-grid" id="kpiGrid">
+    <article class="kpi kpi-purple"><strong>—</strong><span>Total trabajos</span></article>
+    <article class="kpi kpi-green"><strong>—</strong><span>Completados</span></article>
+    <article class="kpi kpi-red"><strong>—</strong><span>Fallidos</span></article>
+    <article class="kpi kpi-amber"><strong>—</strong><span>Media duración</span></article>
+    <article class="kpi kpi-cyan"><strong>—</strong><span>Media px/s</span></article>
+    <article class="kpi kpi-blue"><strong>—</strong><span>Total píxeles</span></article>
+  </section>
+
+  <!-- Controles -->
+  <section class="panel controls">
+    <div class="grid grid-6">
+      <label>Ancho (px)
+        <input id="width" type="number" min="160" max="1600" value="900"/>
+      </label>
+      <label>Alto (px)
+        <input id="height" type="number" min="100" max="1000" value="540"/>
+      </label>
+      <label>Iteraciones máx
+        <input id="maxIter" type="number" min="50" max="2000" value="700"/>
+      </label>
+      <label>Samples/pixel
+        <input id="samples" type="number" min="1" max="12" value="3"/>
+      </label>
+      <label>Tamaño chunk
+        <input id="chunkSize" type="number" min="4" max="128" value="16"/>
+      </label>
+      <label>Modo
+        <select id="mode">
+          <option value="multicore">Multicore</option>
+          <option value="single">Single core</option>
+        </select>
+      </label>
+    </div>
+    <div class="actions">
+      <button id="runBtn">🚀 Renderizar</button>
+      <button id="benchBtn" class="secondary">⚡ Benchmark</button>
+      <span id="status" class="status-text">Listo para renderizar</span>
+    </div>
+    <div class="progress-wrap">
+      <div id="progressBar" class="progress-fill"></div>
+    </div>
+    <div class="render-stats" id="renderStats"></div>
+  </section>
+
+  <!-- Canvas -->
+  <section class="panel viewer">
+    <h2>Render fractal Monte Carlo</h2>
+    <canvas id="canvas" width="900" height="540"></canvas>
+  </section>
+</div>
+
+<!-- ═══════ TAB: HISTORIAL ═══════ -->
+<div class="tab-content" id="tab-history">
+  <section class="panel">
+    <div class="history-toolbar">
+      <input type="text" id="searchHistory" placeholder="Buscar por ID, modo, resolución…" class="search-input"/>
+      <button class="secondary small" id="btnClearHistory">🗑 Limpiar</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>ID</th><th>Fecha</th><th>Modo</th><th>Resolución</th>
+            <th>Iter</th><th>Samples</th><th>Workers</th><th>Duración</th>
+            <th>Px/s</th><th>Estado</th>
+          </tr>
+        </thead>
+        <tbody id="historyBody"></tbody>
+      </table>
+    </div>
+  </section>
+</div>
+
+<!-- ───── CONFIRM OVERLAY ───── -->
+<div class="confirm-overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <h3 id="confirmTitle">Confirmar</h3>
+    <p id="confirmMsg">¿Estás seguro?</p>
+    <div class="confirm-actions">
+      <button id="confirmYes">Aceptar</button>
+      <button id="confirmNo" class="secondary">Cancelar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ───── TOASTS ───── -->
+<div id="toastContainer" class="toast-container"></div>
+
+<footer class="footer">
+  Multicore Render Lab · DAM2 PSP · Luis Rodríguez Cedeño · 2026
+</footer>
+
+<script src="/static/app.js"></script>
 </body>
 </html>

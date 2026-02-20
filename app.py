@@ -326,6 +326,50 @@ def history():
     )
 
 
+@app.get("/api/stats")
+def stats():
+    """KPIs agregados para el dashboard."""
+    conn = db_conn()
+    total = conn.execute("SELECT COUNT(*) FROM render_jobs").fetchone()[0]
+    done = conn.execute(
+        "SELECT COUNT(*) FROM render_jobs WHERE status='done'"
+    ).fetchone()[0]
+    failed = conn.execute(
+        "SELECT COUNT(*) FROM render_jobs WHERE status='failed'"
+    ).fetchone()[0]
+    avg_dur = (
+        conn.execute(
+            "SELECT AVG(duration_ms) FROM render_jobs WHERE status='done'"
+        ).fetchone()[0]
+        or 0
+    )
+    avg_pps = (
+        conn.execute(
+            "SELECT AVG(pixels_per_second) FROM render_jobs WHERE status='done'"
+        ).fetchone()[0]
+        or 0
+    )
+    total_px = (
+        conn.execute(
+            "SELECT SUM(width * height) FROM render_jobs WHERE status='done'"
+        ).fetchone()[0]
+        or 0
+    )
+    conn.close()
+
+    return jsonify(
+        {
+            "ok": True,
+            "total_jobs": total,
+            "done": done,
+            "failed": failed,
+            "avg_duration_ms": round(avg_dur, 2),
+            "avg_pixels_per_second": round(avg_pps, 2),
+            "total_pixels": total_px,
+        }
+    )
+
+
 if __name__ == "__main__":
     init_db()
     app.run(host="127.0.0.1", port=5055, debug=True)
